@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KeyVault — Secure Digital License Store</title>
+  <meta name="description" content="Buy genuine software license keys securely and instantly from KeyVault — your trusted digital key marketplace." />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <link rel="icon" href="favicon.png" />
+  <style>
+    :root {
+      --bg: #060912;
+      --text: #f5f7ff;
+      --muted: #b6bfd5;
+      --accent: #00e0ff;
+      --accent-2: #6c63ff;
+      --card: rgba(255,255,255,0.05);
+      --border: rgba(255,255,255,0.12);
+    }
+    [data-theme="light"] {
+      --bg: #f5f5f5;
+      --text: #060912;
+      --muted: #555;
+      --card: rgba(0,0,0,0.05);
+      --border: rgba(0,0,0,0.12);
+    }
+    * { box-sizing: border-box; }
+    html, body, #root { height: 100%; margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    body { overflow-x: hidden; transition: background .3s, color .3s; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 8%;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      background: rgba(6,9,18,0.7);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      border-bottom: 1px solid var(--border);
+      transition: background .3s, border-color .3s;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.3rem; letter-spacing: .5px; }
+    .logo-icon { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 0 15px rgba(108,99,255,0.3); }
+
+    nav a { color: var(--muted); text-decoration: none; margin-left: 24px; transition: color .3s; font-weight: 500; }
+    nav a:hover { color: var(--accent); }
+    .nav-buttons button { margin-left: 12px; padding: 6px 14px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; transition: all .3s; }
+    .login-btn { background: transparent; color: var(--text); border: 1px solid var(--muted); }
+    .login-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .register-btn { background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #fff; }
+    .register-btn:hover { opacity: 0.9; }
+
+    .toggle-btn { margin-left: 12px; cursor: pointer; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--muted); background: transparent; color: var(--text); }
+
+    main { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 120px 20px 60px; text-align: center; position: relative; overflow: hidden; }
+
+    .hero { max-width: 700px; z-index: 10; margin-bottom: 60px; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
+    .hero p { color: var(--muted); line-height: 1.6; font-size: 1.05rem; margin-bottom: 32px; }
+    .hero button { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border: none; padding: 14px 32px; border-radius: 999px; color: #fff; font-weight: 600; font-size: 1rem; cursor: pointer; transition: transform .3s ease, box-shadow .3s ease; box-shadow: 0 0 20px rgba(0,224,255,0.4); }
+    .hero button:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(108,99,255,0.5); }
+
+    .shop { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 24px; width: 100%; max-width: 1200px; margin: 60px 0; }
+    .product-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: left; transition: transform .3s; }
+    .product-card:hover { transform: translateY(-5px); }
+    .product-card img { width: 100%; border-radius: 10px; margin-bottom: 12px; }
+    .product-card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+    .product-card p { font-size: 0.9rem; color: var(--muted); margin-bottom: 12px; }
+    .product-card button { width: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border: none; padding: 10px; border-radius: 8px; color: #fff; cursor: pointer; font-weight: 600; }
+    .product-card button:hover { opacity: 0.9; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 30px 20px; border-top: 1px solid var(--border); background: rgba(6,9,18,0.8); backdrop-filter: blur(10px); transition: background .3s, border-color .3s; }
+
+    .orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.4; animation: float 12s ease-in-out infinite alternate; mix-blend-mode: screen; }
+    .orb.one { background: var(--accent); width: 400px; height: 400px; top: 10%; left: 10%; animation-delay: 0s; }
+    .orb.two { background: var(--accent-2); width: 500px; height: 500px; bottom: -20%; right: 5%; animation-delay: 3s; }
+
+    @keyframes float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-30px) scale(1.05); } }
+
+    /* Modal styles */
+    .modal-bg { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:2000; }
+    .modal { background: var(--bg); color: var(--text); padding: 30px; border-radius: 12px; width: 320px; max-width: 90%; box-shadow: 0 0 30px rgba(0,0,0,0.4); }
+    .modal h2 { margin-top:0; }
+    .modal input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text); }
+    .modal button { width: 100%; padding: 10px; border-radius: 8px; border: none; background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #fff; font-weight:600; cursor:pointer; }
+    .close-btn { position:absolute; top:10px; right:10px; cursor:pointer; font-weight:bold; color:var(--muted); }
+    @media (max-width: 768px) { nav { display: none; } header { padding: 16px 24px; } }
+  </style>
+</head>
+<body data-theme="dark">
+<div id="root"></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+<script type="text/javascript">
+const { useState, useEffect } = React;
+
+function ShieldIcon({ size = 22, color = "currentColor" }) {
+  return React.createElement('svg', { viewBox: '0 0 24 24', width: size, height: size, fill: color },
+    React.createElement('path', { d: 'M12 2 5 5v6c0 5 3.4 9.7 7 11 3.6-1.3 7-6 7-11V5l-7-3Z' }),
+    React.createElement('circle', { cx: 12, cy: 12, r: 3, fill: '#060912' })
+  );
+}
+
+function Header({ onToggleTheme, onOpenLogin, onOpenRegister }) {
+  return (
+    React.createElement('header', null,
+      React.createElement('div', { className: 'logo' },
+        React.createElement('div', { className: 'logo-icon' }, React.createElement(ShieldIcon, { size: 18, color: "#fff" })),
+        'KeyVault'
+      ),
+      React.createElement('nav', null,
+        React.createElement('a', { href: '#features' }, 'Features'),
+        React.createElement('a', { href: '#shop' }, 'Shop'),
+        React.createElement('a', { href: '#contact' }, 'Contact'),
+        React.createElement('span', { className: 'nav-buttons' },
+          React.createElement('button', { className: 'login-btn', onClick: onOpenLogin }, 'Login'),
+          React.createElement('button', { className: 'register-btn', onClick: onOpenRegister }, 'Register'),
+          React.createElement('button', { className: 'toggle-btn', onClick: onToggleTheme }, 'Toggle Theme')
+        )
+      )
+    )
+  );
+}
+
+function HeroSection() {
+  return React.createElement('section', { className: 'hero' },
+    React.createElement('h1', null, 'Secure Your Software Instantly'),
+    React.createElement('p', null, 'Welcome to KeyVault — the safest place to purchase genuine software license keys. Enjoy instant delivery, verified authenticity, and trusted payment protection.'),
+    React.createElement('button', { onClick: () => document.getElementById('shop').scrollIntoView({behavior:'smooth'}) }, 'Shop Now')
+  );
+}
+
+function Shop() {
+  const products = [
+    { name: 'Windows 11 Pro', desc: 'Genuine Windows 11 Professional License', img: 'https://via.placeholder.com/300x180', link:'#' },
+    { name: 'Microsoft Office 2021', desc: 'Full MS Office Suite License', img: 'https://via.placeholder.com/300x180', link:'#' },
+    { name: 'Adobe Photoshop', desc: 'Adobe Creative Cloud Photoshop License', img: 'https://via.placeholder.com/300x180', link:'#' },
+    { name: 'Norton 360', desc: 'Norton Antivirus Lifetime License', img: 'https://via.placeholder.com/300x180', link:'#' }
+  ];
+  return React.createElement('section', { className:'shop', id:'shop' },
+    products.map((p,i) =>
+      React.createElement('div',{className:'product-card', key:i},
+        React.createElement('img',{src:p.img, alt:p.name}),
+        React.createElement('h3',null,p.name),
+        React.createElement('p',null,p.desc),
+        React.createElement('button',{onClick:()=>window.location.href=p.link},'Buy Now')
+      )
+    )
+  );
+}
+
+function Footer() {
+  return React.createElement('footer', null, '© ', new Date().getFullYear(), ' KeyVault — Secure Digital Store.');
+}
+
+function BackgroundOrbs() {
+  return React.createElement(React.Fragment,null,
+    React.createElement('div',{className:'orb one'}),
+    React.createElement('div',{className:'orb two'})
+  );
+}
+
+function Modal({ title, visible, onClose }) {
+  if(!visible) return null;
+  return React.createElement('div',{className:'modal-bg'},
+    React.createElement('div',{className:'modal'},
+      React.createElement('span',{className:'close-btn', onClick:onClose},'×'),
+      React.createElement('h2', null, title),
+      React.createElement('input',{type:'text', placeholder:'Email'}),
+      React.createElement('input',{type:'password', placeholder:'Password'}),
+      React.createElement('button',{onClick:onClose},'Submit')
+    )
+  );
+}
+
+function App() {
+  const [theme,setTheme] = useState('dark');
+  const [loginVisible,setLoginVisible] = useState(false);
+  const [registerVisible,setRegisterVisible] = useState(false);
+
+  const toggleTheme = () => {
+    const newTheme = theme==='dark'?'light':'dark';
+    setTheme(newTheme);
+    document.body.setAttribute('data-theme',newTheme);
+  };
+
+  useEffect(()=>{ document.title = "KeyVault — Secure Digital License Store"; },[]);
+
+  return React.createElement(React.Fragment,null,
+    React.createElement(Header,{onToggleTheme:toggleTheme, onOpenLogin:()=>setLoginVisible(true), onOpenRegister:()=>setRegisterVisible(true)}),
+    React.createElement('main', null,
+      React.createElement(BackgroundOrbs),
+      React.createElement(HeroSection),
+      React.createElement(Shop)
+    ),
+    React.createElement(Footer),
+    React.createElement(Modal,{title:'Login', visible:loginVisible, onClose:()=>setLoginVisible(false)}),
+    React.createElement(Modal,{title:'Register', visible:registerVisible, onClose:()=>setRegisterVisible(false)})
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+</script>
+</body>
+</html>
